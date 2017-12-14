@@ -5,89 +5,86 @@
 #include "opencv2/highgui/highgui.hpp"
 //#include <opencv2\cv.h>
 #include "opencv2/opencv.hpp"
-#include<stdio.h>
-#include<sys/socket.h>
+#include <stdio.h>
+#include <sys/socket.h>
 #include <stdlib.h>
-#include<netinet/in.h>
-#include<string.h>
-#include<time.h>
-#include<arpa/inet.h>
-#include<unistd.h>
-
+#include <netinet/in.h>
+#include <string.h>
+#include <time.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <math.h>
 #define PORT 20232
 #define DEL 500
-struct sockaddr_in address;
-int sock =0,valRead;
-struct sockaddr_in serv_addr;
+    struct sockaddr_in address;
+    int sock = 0, valread;
+    struct sockaddr_in serv_addr;
 
 
-
-void delay(int milli_seconds){
-	int micro_seconds = 1000*milli_seconds;
-	usleep(micro_seconds);
+void delay(int milli_seconds)
+{int micro_seconds = 1000 * milli_seconds;
+ usleep(micro_seconds);
 }
 
-int setsock(int port,const char ip[100]){
-	char hello[100];
-	char buffer[1024] = {0};
-	if((sock = socket(AF_INET,SOCK_STREAM,0))<0){
-		
-		printf("Socket creation error \n");
-		return -1;
-	}
-	memset(&serv_addr,'0',sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(port);
-	//Cpnvert IPv4 and IPv6 addresses from text to binary form
-	if(inet_pton(AF_INET,ip,&serv_addr.sin_addr)<=0){
-		printf("Invalid address/Address not supported\n");
-		return -1;
-	}
-	if(connect (sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0){
-		printf("Connection failed\n");
-		return -1;
-	}
-	printf("%d %s\n",port,ip);
-	return 0;
+int setsock(int port,const char ip[100])
+{    char hello[100];
+    char buffer[1024] = {0};
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
+    memset(&serv_addr, '0', sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    if(inet_pton(AF_INET, ip, &serv_addr.sin_addr)<=0)
+    { printf("\nInvalid address/ Address not supported \n");
+        return -1;}
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+    printf("%d %s\n",port,ip);
+    return 0;
 }
 
-
-void strategie(const char move[100],int del){
-	int i;
-	char hello[100];
-	printf("%s",move);
-	for(i = 0;i<strlen(move);i++){
-		printf("%c\n",move[i]);
-		if(move[i]=='f'||move[i]=='b'||move[i] == 'r'||move[i]=='l'||move[i]=='s'){
-			sprintf(hello,"%c\n",move[i]);
-			printf("%s sent \n",hello);
-			send(sock,hello,strlen(hello),0);
-			delay(del);
-		}
-	}
-	strcpy(hello,"%s\n");
-	send(sock,hello,strlen(hello),0);
-	printf("%s sent \n",hello);
-	delay(del/2);
+void mov(const char mv[100],int del)
+{int i;
+char hello[100];
+    printf("%s",mv);
+    for(i=0;i<strlen(mv);i++)
+    {printf("%c\n",mv[i]);
+      if(mv[i]=='f'||mv[i]=='b'||mv[i]=='r'||mv[i]=='l'||mv[i]=='s')
+      {sprintf(hello,"%c\n",mv[i]);
+       printf("%s sent\n",hello);
+    send(sock , hello , strlen(hello) , 0 );
+    delay(del);}
+    }
+   strcpy(hello,"s \n");
+        send(sock , hello , strlen(hello) , 0 );
+    printf("%s sent\n",hello);
+    delay(del/2);
 }
-	
+
 using namespace std;
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
 struct robo{int x,y;}a,b;
-int H_MIN = /*164*/111;
+int H_MIN = 164;
 int H_MAX = 181;
-int S_MIN = /*49*/0;
+int S_MIN = 49;
 int S_MAX = 256;
 int V_MIN = 0;
 int V_MAX = 256;
 
-int H_MIN1 = /*28*/47;
-int H_MAX1 = /*56*/89;
-int S_MIN1 = /*49*/23;
-int S_MAX1 = /*256*/119;
-int V_MIN1 = /*0*/106;
+int H_MIN1 =28;
+int H_MAX1 = 56;
+int S_MIN1 = 49;
+int S_MAX1 = 256;
+int V_MIN1 = 0;
 int V_MAX1 = 256;
 //default capture width and height
 const int FRAME_WIDTH = 640;
@@ -241,7 +238,6 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 				//draw object location on screen
 				//cout << x << "," << y;
 				drawObject(x, y, cameraFeed);
-				line(frame, Point(a.x, a.y), Point(b.x , b.y), Scalar(0, 0, 255), 2);
 
 			}
 
@@ -251,12 +247,8 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 	}
 }
 
-/*void showrobo(Mat cameraFeed,Mat HSV,Mat th,Mat th1,struct robo a,struct robo b,VideoCapture capture,bool trackObjects,bool useMorphOps)
-{
-}
-*/
 int main(int argc, char* argv[])
-{
+{printf("Start");
 
 	//some boolean variables for different functionality within this
 	//program
@@ -287,83 +279,86 @@ int main(int argc, char* argv[])
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
-       int i,var=20;
-	float m;
-	int nd = 0,od=0;
-	printf("Socket begin");
-	struct robot oldPos,newPos;
-	setsock(20232,"193.226.12.217");
-	strategie("ss",200);
-	while (1) {
-		for(i=0;i<2;i++){
-			
-			//store image to matrix
-			capture.read(cameraFeed);
-			//convert frame from BGR to HSV colorspace
-			cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
-			//filter HSV image between values and store filtered image to
-			//threshold matrix
-			inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-			inRange(HSV, Scalar(H_MIN1, S_MIN1, V_MIN1), Scalar(H_MAX1, S_MAX1, V_MAX1), threshold1);
-			//perform morphological operations on thresholded image to eliminate noise
-			//and emphasize the filtered object(s)
-			if (useMorphOps)
-			{morphOps(threshold);morphOps(threshold1);}
-			//pass in thresholded frame to our object tracking function
-			//this function will return the x and y coordinates of the
-			//filtered object
-			if (trackObjects)
-			{trackFilteredObject(a.x, a.y, threshold, cameraFeed);
-                 	trackFilteredObject(b.x, b.y, threshold1, cameraFeed);}
-			//show frames
-			//imshow(windowName4, threshold1);
-			//imshow(windowName2, threshold);
-		        imshow(windowName, cameraFeed);
-		        // imshow(windowName1, HSV);
-			setMouseCallback("Original Image", on_mouse, &p);
-			//delay 30ms so that screen can refresh.
-			//image will not appear without this waitKey() command
-			waitKey(30);
-			//a-roz, b-galben
-			if(i==0){
-				oldPos=b;strategie("fs",300);
-				printf("oldPos %d -%d\n",oldPos.x,oldPos.y);
-			}
-			else if(i==1){
-				newPos = b;
-				printf("newPos %d-%d\n",newPos.x,newPos.y);
-				m = (float)(newPos.y-oldPos.y)/(float)(newPos.x-oldPos.x);
-				line(cameraFeed,Point(oldPos.x,oldPos.y),Point(newPos.x,newPos.y),Scalar(0,100,255),2);
-				if(oldPos.x!=newPos.x||oldPos.y!=newPos.y){
-					nd = sqrt((newPos.x-a.x)^2+(newPos.y-a.y)^2);
-					od = sqrt((oldPos.x-a.x)^2+(oldPos.y-a.y)^2);
-					printf("New dist =%d Old dis = %d\n",nd,od);
-					if(nd>od){
-						printf("Reverse\n");
-						if(a.y>m*(a.x-newPos.x)+newPos.y+var){
-							stategie("11",300);
-						}
-						else if(a.y<=m*(a.x-newPos.x)+newPos.y-var){
-							strategie("rr",300);
-						}
-					}
-					else{
-						if(a.y>m*(a.x-newPos.x)+newPos.y+var){
-							strategie("rf",300);
-						}
-						else if(a.y<m*(a.x-newPos.x)+newPos.y-var){
-							strategie("lf",300);
-						}
-						else{
-							strategie("ff",1000);
-						}
-					}
-				}
 
-			}
-		}
-		waitkey(30);
+ int i,var=20;
+ float m;
+ int nd=0,od=0;
+ printf("Socket begin");
+ struct robo oldpos,newpos;
+ setsock(20232,"193.226.12.217");
+ strateg("ss",200);
+bool old=true;
+    while (1)
+  {       //store image to matrix
+		capture.read(cameraFeed);
+		//convert frame from BGR to HSV colorspace
+		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+		//filter HSV image between values and store filtered image to
+		//threshold matrix
+		//setObj(Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold,cameraFeed,HSV,useMorphOps,trackObjects,&a);
+		//setObj(Scalar(H_MIN1,S_MIN1,V_MIN1),Scalar(H_MAX1,S_MAX1,V_MAX1),threshold1,cameraFeed,HSV,useMorphOps,trackObjects,&b);
+		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+		inRange(HSV, Scalar(H_MIN1, S_MIN1, V_MIN1), Scalar(H_MAX1, S_MAX1, V_MAX1), threshold1);
+		//perform morphological operations on thresholded image to eliminate noise
+		//and emphasize the filtered object(s)
+		if (useMorphOps)
+		{morphOps(threshold);
+		 morphOps(threshold1);}
+		//pass in thresholded frame to our object tracking function
+		//this function will return the x and y coordinates of the
+		//filtered object
+		if (trackObjects)
+		{trackFilteredObject(a.x, a.y, threshold, cameraFeed);
+         trackFilteredObject(b.x, b.y, threshold1,cameraFeed);}
+		//show frames
+		//imshow(windowName4, threshold1);
+		//imshow(windowName2, threshold);
+		imshow(windowName, cameraFeed);
+		//imshow(windowName1, HSV);
+		setMouseCallback("Original Image", on_mouse, &p);
+		//delay 30ms so that screen can refresh.
+		//image will not appear without this waitKey() command
+		waitKey(50);
+	 //a-roz  b-galben
+	if(old)
+	{oldpos=b;
+	 mov("fs",300);
+	 printf("oldpos %d-%d\n",oldpos.x,oldpos.y);
+	 old=false;
 	}
+	else
+	{old = true;
+     newpos=b;
+	  printf("newpos %d-%d",newpos.x,newpos.y);
+	  m=(float)(newpos.y-oldpos.y)/(float)(newpos.x-oldpos.x);
+	  printf("Panta dreapta : %f \n",m);
+	  if(oldpos.x!=newpos.x||oldpos.y!=newpos.y)
+      {nd=sqrt((newpos.x-a.x)^2+(newpos.y-a.y)^2);
+       od=sqrt((oldpos.x-a.x)^2+(oldpos.y-a.y)^2);
+	printf("New dist= %d Old dist= %d \n",nd,od);
+       if(nd>od)
+	{printf("Reverse\n");
+	  if(a.y>m*(a.x-newpos.x) +newpos.y+var)
+	  {if(newpos.x<oldpos.x)
+	    mov("rr",300);
+    else mov("ll",300);}
+	  else if(a.y<=m*(a.x-newpos.x) +newpos.y-var)
+	  {if(newpos.x<oldpos.x)
+	    mov("ll",300);
+    else mov("rr",300);}
+	}
+	else{
+	if(a.y>m*(a.x-newpos.x) +newpos.y+var) //mai mare sau mai mic y decat y dreapta
+	{if(newpos.x<oldpos.x) //vad dak o ia la stanga sau la dreapta relativ la fereastra
+	    mov("rf",300);
+    else mov("lf",300);}
+	  else if(a.y<m*(a.x-newpos.x) +newpos.y-var)
+	 {if(newpos.x<oldpos.x)
+	    mov("lf",300);
+    else mov("rf",300);}
+	 else {mov("ff",1000);}
+	}
+	}}}
 
 	return 0;
 }
