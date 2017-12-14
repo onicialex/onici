@@ -311,8 +311,8 @@ bool old=true;
 		{trackFilteredObject(a.x, a.y, threshold, cameraFeed);
          trackFilteredObject(b.x, b.y, threshold1,cameraFeed);}
 		//show frames
-		//imshow(windowName4, threshold1);
-		//imshow(windowName2, threshold);
+		imshow(windowName4, threshold1);
+		imshow(windowName2, threshold);
 		imshow(windowName, cameraFeed);
 		//imshow(windowName1, HSV);
 		setMouseCallback("Original Image", on_mouse, &p);
