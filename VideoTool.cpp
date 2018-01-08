@@ -286,7 +286,7 @@ int main(int argc, char* argv[])
  printf("Socket begin");
  struct robo oldpos,newpos;
  setsock(20232,"193.226.12.217");
- strateg("ss",200);
+ mov("ss",200);
 bool old=true;
     while (1)
   {       //store image to matrix
